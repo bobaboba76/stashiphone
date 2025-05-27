@@ -1,0 +1,32 @@
+name: Update Stash Config
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # Ежедневно в 2:00 UTC
+  workflow_dispatch:
+
+jobs:
+  update-config:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Download and update config
+        run: python generate_config.py
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "GitHub Action"
+          git config user.email "action@github.com"
+          git add stash.yaml
+          git commit -m "Daily update"
+          git push
